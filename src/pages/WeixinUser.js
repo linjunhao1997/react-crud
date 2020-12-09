@@ -1,7 +1,7 @@
 import {Card, Table, Button, Popconfirm, Modal, message, Space, Input, DatePicker, Form} from 'antd';
 import axios from 'axios';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import React, { useState,useEffect,useRef,forwardRef } from 'react'
+import React, { useState,useEffect,useRef,forwardRef, useCallback } from 'react'
 import moment from 'moment';
 const { confirm } = Modal;
 const { Search } = Input;
@@ -18,7 +18,7 @@ function WeixinUser() {
     const [data, setData] = useState({});
     const [selectedRowKeys, setSelectedRowKeys ] = useState([]);
     const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(5)
+    const [pageSize, setPageSize] = useState(10)
     const [total, setTotal] = useState(0);
     const [pagination, setPagination] = useState(true);
     const [deleteOp, setDeleteOp] = useState(0);
@@ -28,15 +28,19 @@ function WeixinUser() {
     const [insertFormModalVisible, setInsertFormModalVisible] = useState(false);
     const [insertOp, setInsertOp] = useState(0);
     const [form] = Form.useForm();
+
+
     const listByPage = function(page, pageSize) {
+        setPage(page)
         setPageSize(pageSize)
         axios.post('http://127.0.0.1:8889/xproject/weixinUser/list', { page: page, rows: pageSize, keyword: keyword, beginDate: searchDate.beginDate, endDate: searchDate.endDate})
             .then((resp) => {
-                console.log(resp.data.data.records);
+                console.log(resp.data.data);
                 setData(resp.data.data);
                 if (resp.data.data.records.length === 0 && page === 1) {
                     setPagination(false)
                 } else if (resp.data.data.records.length === 0 && page > 1) {
+                    console.log("进来减1")
                     setPage(--page)
                 }
                 if (resp.data.total > 0) {
@@ -60,6 +64,8 @@ function WeixinUser() {
                         },
                     });
                     setDeleteOp(deleteOp + 1);
+                    //listByPage(page, pageSize)
+                    console.log(page);
                 } else {
                     message.error({
                         content: '删除失败',
@@ -99,9 +105,16 @@ function WeixinUser() {
     }
 
 
-    useEffect((page, pageSize) => {
+    useEffect(() => {
         listByPage(page, pageSize)
-    },[deleteOp, keyword, searchDate, insertOp])
+    },[deleteOp, insertOp])
+
+    useEffect(() => {
+        setPage(1);
+        listByPage(page, pageSize)
+        console.log("现在" + page)
+    },[keyword,searchDate, pageSize])
+
 
     const columns = [
         {
@@ -168,12 +181,16 @@ function WeixinUser() {
             }
         ],
     };
+
+    const onCancel = function() {
+        setInsertFormModalVisible(false);
+        form.resetFields();
+    }
     const onCreate = (formData) => {
-        console.log(modal);
-        axios.post('http://127.0.0.1:8889/xproject/weixinUser', formData)
+        console.log('Received values of form: ', formData);
+        return axios.post('http://127.0.0.1:8889/xproject/weixinUser', formData)
             .then((resp) => {
                 if (resp.data.code == 200) {
-                    setInsertOp(insertOp + 1);
                     message.success({
                         content: '新增成功',
                         className: 'custom-class',
@@ -181,6 +198,10 @@ function WeixinUser() {
                             marginTop: '20vh',
                         },
                     });
+                    setInsertOp(insertOp + 1)
+                    // listByPage(page, pageSize)
+                    console.log(page);
+
                 } else {
                     message.error({
                         content: '新增失败',
@@ -199,78 +220,15 @@ function WeixinUser() {
                 },
             })
         })
-        setInsertFormModalVisible(false)
-        console.log('Received values of form: ', formData);
     };
 
-    const InsertFormModel = ({ visible, onCreate, onCancel }) => {
-
-        return (
-            <>
-            <Modal
-                title="新增"
-                centered
-                visible={visible}
-                width={1000}
-                destroyOnClose={false}
-                onCancel={onCancel}
-                onOk={() => {
-                    form
-                        .validateFields()
-                        .then((formData) => {
-                            form.resetFields();
-                            onCreate(formData);
-                        })
-                        .catch((info) => {
-                            console.log('Validate Failed:', info);
-                        });
-                }}
-            >
-                <Form
-                    preserve={false}
-                    form={form}
-                    layout="vertical"
-                    name="form_in_modal"
-                    initialValues={{
-                        modifier: 'public',
-                    }}
-                >
-                    <Form.Item
-                        name="nickname"
-                        label="nickname"
-                        rules={[
-                            {
-                                required: true,
-                                message: '必须录入!',
-                            },
-                        ]}
-                    >
-                        <Input type="text" />
-                    </Form.Item>
-                    <Form.Item
-                        name="province"
-                        label="province"
-                        rules={[
-                            {
-                                required: true,
-                                message: '必须录入!',
-                            },
-                        ]}
-                    >
-                        <Input type="text" />
-                    </Form.Item>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit" onClick={() => setInsertFormModalVisible(false)}>
-                            Submit
-                        </Button>
-                    </Form.Item>
-
-                </Form>
-            </Modal>
-                </>
-        );
+    const layout = {
+        labelCol: { span: 8},
+        wrapperCol: { span: 16}
     };
-
+    const tailLayout = {
+        wrapperCol: {offset: 8, span: 16}
+    }
 
     return (
         <>
@@ -302,15 +260,79 @@ function WeixinUser() {
                     dataSource={data.records}
                     scroll={{ x: 1000, y: 800 }}
                     rowKey={record => record.id}
-                    pagination={{pagination}?{total: data.total, defaultPageSize: 5, onChange: listByPage, showQuickJumper: true, showSizeChanger: true}:false}/>
+                    pagination={{pagination}?
+                        {
+                            total: data.total,
+                            current: data.page,
+                            defaultPageSize: pageSize,
+                            defaultCurrent: 1,
+                            onChange: listByPage,
+                            showQuickJumper: true,
+                            showSizeChanger: true,
+                            showTotal: (total, range) => `${range[0]}-${range[1]} 共 ${total} 条`
+                        } :false}/>
                 </Space>
-                <InsertFormModel
+                <Modal
+                    title="新增"
+                    centered
                     visible={insertFormModalVisible}
-                    onCreate={(formData)=>onCreate(formData)}
-                    onCancel={() => {
-                        setInsertFormModalVisible(false);
-                    }}
-                />
+                    width={1000}
+                    destroyOnClose={false}
+                    onCancel={()=>onCancel()}
+                    /* onOk={() => {
+                         form
+                             .validateFields()
+                             .then((formData) => {
+                                 form.resetFields();
+                                 onCreate(formData);
+                             })
+                             .catch((info) => {
+                                 console.log('Validate Failed:', info);
+                             });
+                     }}*/
+                    footer={null}
+                >
+                    <Form form={form}
+                        {...layout}
+                        preserve={false}
+                        /*form={form}*/
+                        layout="vertical"
+                        name="form_in_modal"
+                        onFinish={onCreate}
+
+                    >
+                        <Form.Item
+                            name="nickname"
+                            label="nickname"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: '必须录入!',
+                                },
+                            ]}
+                        >
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item
+                            name="province"
+                            label="province"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: '必须录入!',
+                                },
+                            ]}
+                        >
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item {...tailLayout}>
+                            <Button type="primary" htmlType="submit">
+                                确定
+                            </Button>
+                        </Form.Item>
+
+                    </Form>
+                </Modal>
             </Card>
         </>
 
