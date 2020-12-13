@@ -1,4 +1,4 @@
-import {Card, Table, Button, Popconfirm, Modal, message, Space, Input, DatePicker, Form} from 'antd';
+import {Card, Table, Button, Popconfirm, Modal, message, Space, Input, DatePicker, Form, Row, Col} from 'antd';
 import axios from 'axios';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import React, { useState,useEffect,useRef,forwardRef, useCallback } from 'react'
@@ -33,7 +33,7 @@ function WeixinUser() {
     const listByPage = function(page, pageSize) {
         setPage(page)
         setPageSize(pageSize)
-        axios.post('http://127.0.0.1:8889/xproject/weixinUser/list', { page: page, rows: pageSize, keyword: keyword, beginDate: searchDate.beginDate, endDate: searchDate.endDate})
+        axios.post('http://127.0.0.1:8888/xproject/weixinUser/list', { page: page, rows: pageSize, keyword: keyword, beginDate: searchDate.beginDate, endDate: searchDate.endDate})
             .then((resp) => {
                 console.log(resp.data.data);
                 setData(resp.data.data);
@@ -53,7 +53,7 @@ function WeixinUser() {
     }
 
     const deleteRecordsPromise = function(ids) {
-        return axios.delete('http://127.0.0.1:8889/xproject/weixinUser', {data: ids})
+        return axios.delete('http://127.0.0.1:8888/xproject/weixinUser', {data: ids})
             .then((resp) => {
                 if (resp.data.code == 200) {
                     message.success({
@@ -188,7 +188,7 @@ function WeixinUser() {
     }
     const onCreate = (formData) => {
         console.log('Received values of form: ', formData);
-        return axios.post('http://127.0.0.1:8889/xproject/weixinUser', formData)
+        return axios.post('http://127.0.0.1:8888/xproject/weixinUser', formData)
             .then((resp) => {
                 if (resp.data.code == 200) {
                     message.success({
@@ -273,6 +273,7 @@ function WeixinUser() {
                         } :false}/>
                 </Space>
                 <Modal
+                    bodyStyle={{height: '500px', overflowY: 'scroll'}}
                     title="新增"
                     centered
                     visible={insertFormModalVisible}
@@ -290,7 +291,22 @@ function WeixinUser() {
                                  console.log('Validate Failed:', info);
                              });
                      }}*/
-                    footer={null}
+                    footer={
+
+                        <Row>
+                            <Col span={4} offset={10}>
+                                <Space>
+                                    <Button key="yes" type="primary" onClick={() => { onCreate(form.getFieldsValue())}}>
+                                        确认
+                                    </Button>,
+                                    <Button key="no" onClick={() => { onCancel()}}>
+                                        取消
+                                    </Button>
+                                </Space>
+                            </Col>
+                        </Row>
+
+                    }
                 >
                     <Form form={form}
                         {...layout}
@@ -329,6 +345,60 @@ function WeixinUser() {
                             <Button type="primary" htmlType="submit">
                                 确定
                             </Button>
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Input type="text" />
                         </Form.Item>
 
                     </Form>
