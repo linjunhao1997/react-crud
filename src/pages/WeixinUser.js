@@ -16,6 +16,7 @@ function WeixinUser() {
     const modal = useRef(null);
 
     const [data, setData] = useState({});
+    const [detail, setDetail] = useState({nickname: "no"});
     const [selectedRowKeys, setSelectedRowKeys ] = useState([]);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10)
@@ -27,8 +28,84 @@ function WeixinUser() {
     const [searchDate, setSearchDate] = useState({beginDate: null, endDate: null});
     const [insertFormModalVisible, setInsertFormModalVisible] = useState(false);
     const [insertOp, setInsertOp] = useState(0);
+    const [modalButton, setModalButton] = useState( () => {
+        return (
+            <>
+                <Button key="yes" type="primary" onClick={() => { onCreate(form.getFieldsValue())}}>
+                    确认
+                </Button>,
+                <Button key="no" onClick={() => { onCancel()}}>
+                    取消
+                </Button>,
+                <Button key="update" onClick={() => { onUpdate()}}>
+                    修改
+                </Button>
+            </>
+
+        )
+    })
+    const onUpdate = function() {
+        setModalButton(() => {
+            return (
+                <>
+                    <Button key="yes" type="primary" onClick={() => { onCreate(form.getFieldsValue())}}>
+                        确认
+                    </Button>,
+                    <Button key="no" onClick={() => { onCancel()}}>
+                        取消
+                    </Button>,
+                </>
+
+            )
+        })
+    }
+
     const [form] = Form.useForm();
 
+    const formItem = [{
+        field: "nickname",
+        dataType: "String",
+        rule: [ {
+            required: true,
+            message: '必须录入!',
+        }]
+    },{
+        field: "province",
+        dataType: "String",
+        rule: [ {
+            required: true,
+            message: '必须录入!',
+        }]
+    }]
+
+    const  getDetail = function(id) {
+        return axios.get('http://127.0.0.1:8888/xproject/weixinUser/' + id)
+            .then((resp) => {
+                if (resp.data.code == 200) {
+                    //setDetail(resp.data.data);
+                    form.setFieldsValue(resp.data.data)
+                    console.log(resp.data.data);
+
+                    setInsertFormModalVisible(true);
+                } else {
+                    message.error({
+                        content: '查询失败',
+                        className: 'custom-class',
+                        style: {
+                            marginTop: '20vh',
+                        },
+                    });
+                }
+            }).catch( err => {
+                message.error({
+                    content: '异常错误',
+                    className: 'custom-class',
+                    style: {
+                        marginTop: '20vh',
+                    },
+                })
+            })
+    }
 
     const listByPage = function(page, pageSize) {
         setPage(page)
@@ -85,6 +162,8 @@ function WeixinUser() {
                     })
             })
     }
+
+
 
     const deleteConfirm = function(ids) {
         console.log(ids);
@@ -150,7 +229,8 @@ function WeixinUser() {
             render: (record) => {
                 return(
                     <div>
-                        <Button type='primary' size='small'>修改</Button>
+                        <Button type='primary' size='small' onClick={() => getDetail(record.id)}>详情</Button>
+                        <Button style={{margin: '0 1rem'}} type='primary' size='small'>修改</Button>
                         <Button style={{margin: '0 1rem'}} type='danger' size='small' onClick={() => deleteConfirm(new Array(record.id))}>删除</Button>
                     </div>
                 )
@@ -181,6 +261,8 @@ function WeixinUser() {
             }
         ],
     };
+
+
 
     const onCancel = function() {
         setInsertFormModalVisible(false);
@@ -229,10 +311,21 @@ function WeixinUser() {
     const tailLayout = {
         wrapperCol: {offset: 8, span: 16}
     }
+    const FormItems = [];
+    formItem.forEach((e) => {
+        FormItems.push((
+            <Form.Item
+                name={e.field}
+                label={e.field}
+                rules={e.rule}
+            >
+                <Input type="text" />
+            </Form.Item>
+        ));
+    })
 
     return (
         <>
-
             <Card title="微信用户" extra={[
                 <Button key='1' type="primary" size="small" onClick={() => setInsertFormModalVisible(true)}>新增</Button>,
                 <Button key='2' type="danger" size="small" onClick={() => {deleteConfirm(selectedRowKeys.map((currentValue,index,arr) => {return arr[index]}))}}>删除</Button>]
@@ -273,35 +366,19 @@ function WeixinUser() {
                         } :false}/>
                 </Space>
                 <Modal
-                    bodyStyle={{height: '500px', overflowY: 'scroll'}}
+                    bodyStyle={{maxHeight: '500px', overflowY: 'scroll'}}
+                    width={500}
                     title="新增"
                     centered
                     visible={insertFormModalVisible}
-                    width={1000}
                     destroyOnClose={false}
                     onCancel={()=>onCancel()}
-                    /* onOk={() => {
-                         form
-                             .validateFields()
-                             .then((formData) => {
-                                 form.resetFields();
-                                 onCreate(formData);
-                             })
-                             .catch((info) => {
-                                 console.log('Validate Failed:', info);
-                             });
-                     }}*/
                     footer={
 
                         <Row>
-                            <Col span={4} offset={10}>
+                            <Col span={8} offset={8}>
                                 <Space>
-                                    <Button key="yes" type="primary" onClick={() => { onCreate(form.getFieldsValue())}}>
-                                        确认
-                                    </Button>,
-                                    <Button key="no" onClick={() => { onCancel()}}>
-                                        取消
-                                    </Button>
+                                    {modalButton}
                                 </Space>
                             </Col>
                         </Row>
@@ -311,101 +388,15 @@ function WeixinUser() {
                     <Form form={form}
                         {...layout}
                         preserve={false}
-                        /*form={form}*/
                         layout="vertical"
                         name="form_in_modal"
                         onFinish={onCreate}
-
                     >
-                        <Form.Item
-                            name="nickname"
-                            label="nickname"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: '必须录入!',
-                                },
-                            ]}
-                        >
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item
-                            name="province"
-                            label="province"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: '必须录入!',
-                                },
-                            ]}
-                        >
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item {...tailLayout}>
-                            <Button type="primary" htmlType="submit">
-                                确定
-                            </Button>
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Input type="text" />
-                        </Form.Item>
-
+                        {FormItems}
                     </Form>
                 </Modal>
             </Card>
         </>
-
     )
 }
 export default  WeixinUser
