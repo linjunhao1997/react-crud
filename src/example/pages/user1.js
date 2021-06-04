@@ -1,8 +1,14 @@
-import React from 'react';
-import { Button, Col, Form, Input, Row, Table, Select } from 'antd';
+import {React, useState} from 'react';
+import { Button, Col, Form, Input, Row, Table, Select, Modal, Descriptions } from 'antd';
 import { useAntdTable } from 'ahooks';
+import {
+    ControlledMenu,
+    MenuItem
+} from '@szhsin/react-menu';
+import '@szhsin/react-menu/dist/index.css';
 import { PaginatedParams } from 'ahooks/lib/useAntdTable';
-
+import { sorter2s } from '@/lib/antd/sorter2s'
+import { useHistory, useLocation } from 'react-router';
 const { Option } = Select;
 
 interface Item {
@@ -19,10 +25,14 @@ interface Result {
     list: Item[];
 }
 
+let sorters = {}
+
 const getTableData = (
-    { current, pageSize }: PaginatedParams[0],
+
+    { current, pageSize,sorter }: PaginatedParams[0],
     formData: Object,
 ): Promise<Result> => {
+
     let query = `page=${current}&size=${pageSize}`;
     Object.entries(formData).forEach(([key, value]) => {
         if (value) {
@@ -30,6 +40,8 @@ const getTableData = (
         }
     });
 
+    sorters = sorter2s(sorter, sorters)
+    console.log(sorters)
     return fetch(`https://randomuser.me/api?results=55&${query}`)
         .then((res) => res.json())
         .then((res) => ({
@@ -39,12 +51,56 @@ const getTableData = (
 };
 
 const User1 = () => {
+    const history = useHistory()
+    const location = useLocation()
+    const [isOpen, setOpen] = useState(false);
+    const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
+    const [currentRecord, setCurrentRecord] = useState(null);
+    const [modelState, setModelState] = useState({
+        title: "",
+        visible: false
+    })
+    const handleCreateClick = () => {
+        
+    }
+
+    const handleDetailClick = () => {
+      
+        history.push(location.pathname + "/" + currentRecord.id.value)
+
+    }
+
+    const handleUpdateClick = () => {
+        setModelState({
+            title: '修改',
+            visible: true
+           }
+        )
+    }
+
+    const handleDeleteClick = () => {
+        
+    }
+
+    const handleCancelClick = () => {
+        setModelState({
+            visible: false
+           }
+        )
+    }
+
     const [form] = Form.useForm();
 
     const { tableProps, search } = useAntdTable(getTableData, {
         defaultPageSize: 5,
         form,
     });
+   
+    const { pagination } = tableProps
+    pagination.showTotal = (total) => {
+        return `共 ${total} 条`;
+    }
+    pagination.showQuickJumper = true
 
     const { type, changeType, submit, reset } = search;
 
@@ -60,10 +116,17 @@ const User1 = () => {
         {
             title: 'phone',
             dataIndex: 'phone',
+            sorter: {
+                multiple: 1,
+            }
         },
         {
             title: 'gender',
             dataIndex: 'gender',
+            sorter: {
+                multiple: 2,
+            }
+
         },
     ];
 
@@ -87,16 +150,17 @@ const User1 = () => {
                         </Form.Item>
                     </Col>
                 </Row>
-                <Row>
+                <Row justify="end">
+            
                     <Form.Item style={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button type="primary" onClick={submit}>
-                            Search
+                            查询
                         </Button>
                         <Button onClick={reset} style={{ marginLeft: 16 }}>
-                            Reset
+                            重置
                         </Button>
                         <Button type="link" onClick={changeType}>
-                            Simple Search
+                            简单查询
                         </Button>
                     </Form.Item>
                 </Row>
@@ -118,17 +182,56 @@ const User1 = () => {
                     <Input.Search placeholder="enter name" style={{ width: 240 }} onSearch={submit} />
                 </Form.Item>
                 <Button type="link" onClick={changeType}>
-                    Advanced Search
+                    复杂查询
                 </Button>
             </Form>
         </div>
     );
 
+  
+    const modal = (
+        <div>
+            <Modal
+          title={modelState.title}
+          visible={modelState.visible}
+          onOk={()=>{}}
+          onCancel={handleCancelClick}
+          okText="确认"
+          cancelText="取消"
+        >
+          <p>{modelState.visible?currentRecord.gender:null}</p>
+        </Modal>
+        </div>
+    )
+
     return (
         <div>
             {type === 'simple' ? searchForm : advanceSearchForm}
-            <Table columns={columns} rowKey="email" {...tableProps} />
+            <Table 
+                columns={columns} 
+                rowKey="email" 
+                {...tableProps} 
+                onRow={record => {
+                    return {
+                      onContextMenu: e => {
+                        console.log(record)
+                        e.preventDefault();
+                        setAnchorPoint({ x: e.clientX, y: e.clientY });
+                        setOpen(true);
+                        setCurrentRecord(record)
+                      },
+                    };
+                  }}/>
+            <ControlledMenu anchorPoint={anchorPoint} isOpen={isOpen}
+                onClose={() => setOpen(false)}>
+                <MenuItem onClick={handleDetailClick}>详情</MenuItem>
+                <MenuItem onClick={handleUpdateClick}>修改</MenuItem>
+                <MenuItem onClick={handleDeleteClick}>删除</MenuItem>
+            </ControlledMenu>
+            {modal}
         </div>
+
+       
     );
 };
 

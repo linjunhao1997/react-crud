@@ -1,5 +1,5 @@
 import '@/App.css';
-import {Layout, Menu} from 'antd';
+import {Layout, Menu, Breadcrumb, PageHeader, Divider} from 'antd';
 import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
@@ -18,10 +18,12 @@ import {
 } from 'react-router-dom'
 import User from "@/example/pages/user";
 import User1 from "@/example/pages/user1";
+import User1Detail from "@/example/pages/user1Detail";
+ 
+import RoutePath from '@/lib/antd/path'
 
 const {Header, Sider, Content, Footer} = Layout;
 const {SubMenu} = Menu;
-
 
 const App = () => {
     const [state, setState] = useState({
@@ -62,12 +64,14 @@ const App = () => {
                     <Menu mode="inline" openKeys={openKeys} onOpenChange={onOpenChange}>
                         <SubMenu key="sub1" icon={<UserOutlined/>} title="用户">
                             <Menu.Item key="1">
-                                <Link to="/user">用户示例</Link>
+                                <Link to="/user/user_info">用户示例</Link>
                             </Menu.Item>
                             <Menu.Item key="2">
-                                <Link to="/user1">用户示例1</Link>
+                                <Link to="/user/user_info1">用户示例1</Link>
                             </Menu.Item>
-                            <Menu.Item key="3">Option 3</Menu.Item>
+                            <Menu.Item key="3">
+                                <Link to="/user/user_info2/123456">测试</Link>
+                            </Menu.Item>
                             <Menu.Item key="4">Option 4</Menu.Item>
                         </SubMenu>
                         <SubMenu key="sub2" icon={<AppstoreOutlined/>} title="Navigation Two">
@@ -86,6 +90,7 @@ const App = () => {
                         </SubMenu>
                     </Menu>
                 </Sider>
+               
                 <Layout className="site-layout">
                     <Header className="site-layout-background" style={{padding: 0}}>
                         {React.createElement(state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
@@ -96,25 +101,36 @@ const App = () => {
                             }
                         })}
                     </Header>
+                  
+                    
+                    <div className="site-page-header-ghost-wrapper">
+                    <PageHeader ghost={false}>
+                    <RoutePath></RoutePath>
+                    </PageHeader>
+                    </div>
                     <Content
                         className="site-layout-background"
                         style={{
-                            margin: '24px 16px',
+                            margin: '14px 14px',
                             padding: 24,
                             minHeight: 280,
                         }}
                     >
                         <Switch>
-                            <Route path="/user">
+                            <Route path="/user/user_info">
                                 <User />
                             </Route>
-                            <Route path="/user1">
+                            <Route path="/user/user_info1">
                                 <User1 />
                             </Route>
+                            <Route path="/user/user_info2/:id" component={User1Detail}/>
                         </Switch>
+                     
                     </Content>
+                  
                     <Footer style={{textAlign: 'center'}}>Ant Design ©2021 Created by voice244</Footer>
                 </Layout>
+               
             </Layout>
         </Router>
     );
