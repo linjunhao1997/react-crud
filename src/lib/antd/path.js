@@ -1,11 +1,15 @@
 import { Breadcrumb  } from 'antd';
-import { Link, useLocation }from 'react-router-dom';
+import { useLocation }from 'react-router-dom';
+import React from "react";
 
 //具体导航的名称
-const breadcrumbNameMap = {
+const map = {
     '/user':'用户管理',
     '/user/user_info':'用户信息',
     '/user/user_info1':'用户信息1',
+
+    '/question': '试题',
+    '/question/table': '问题列表',
 }
 
 const RoutePath = () => {
@@ -14,7 +18,7 @@ const RoutePath = () => {
         const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;    
         return (
           <Breadcrumb.Item key={url}>
-               {breadcrumbNameMap[url]}
+               {map[url]}
           </Breadcrumb.Item>
         );
       });

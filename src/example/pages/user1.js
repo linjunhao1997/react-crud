@@ -66,7 +66,7 @@ const User1 = () => {
 
     const handleDetailClick = () => {
       
-        history.push(location.pathname + "/" + currentRecord.id.value)
+        history.push("/user/user_info1/123456")
 
     }
 

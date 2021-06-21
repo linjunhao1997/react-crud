@@ -103,7 +103,7 @@ module.exports = function (proxy, allowedHost) {
     // `proxy` is run between `before` and `after` `webpack-dev-server` hooks
     proxy: {
       '/api': {
-        target: 'https://j.i8tq.com/weather2020/weatherMap', // 后台服务地址以及端口号
+        target: 'http://127.0.0.1:8888/xproject', // 后台服务地址以及端口号
         ws: true,
         changeOrigin: true, //是否跨域
         pathRewrite: { '^/api': '' }

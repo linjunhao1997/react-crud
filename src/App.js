@@ -1,5 +1,5 @@
 import '@/App.css';
-import {Layout, Menu, Breadcrumb, PageHeader, Divider} from 'antd';
+import {Layout, Menu, PageHeader} from 'antd';
 import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
@@ -12,15 +12,15 @@ import React, {useState} from "react";
 import SettingOutlined from "@ant-design/icons/lib/icons/SettingOutlined";
 import AppstoreOutlined from "@ant-design/icons/lib/icons/AppstoreOutlined";
 import {
-    BrowserRouter as Router,
     Route,
     Link, Switch
 } from 'react-router-dom'
 import User from "@/example/pages/user";
 import User1 from "@/example/pages/user1";
 import User1Detail from "@/example/pages/user1Detail";
- 
+import QuestionTable from "@/pages/question/question_table"
 import RoutePath from '@/lib/antd/path'
+import QuestionDetail from "@/pages/question/question_detail";
 
 const {Header, Sider, Content, Footer} = Layout;
 const {SubMenu} = Menu;
@@ -48,7 +48,6 @@ const App = () => {
     }
 
     return (
-        <Router>
             <Layout>
                 <Sider trigger={null}
                        collapsible
@@ -69,13 +68,13 @@ const App = () => {
                             <Menu.Item key="2">
                                 <Link to="/user/user_info1">用户示例1</Link>
                             </Menu.Item>
-                            <Menu.Item key="3">
-                                <Link to="/user/user_info2/123456">测试</Link>
-                            </Menu.Item>
+
                             <Menu.Item key="4">Option 4</Menu.Item>
                         </SubMenu>
-                        <SubMenu key="sub2" icon={<AppstoreOutlined/>} title="Navigation Two">
-                            <Menu.Item key="5">Option 5</Menu.Item>
+                        <SubMenu key="sub2" icon={<AppstoreOutlined/>} title="试题">
+                            <Menu.Item key="5">
+                                <Link to="/question/table">列表</Link>
+                            </Menu.Item>
                             <Menu.Item key="6">Option 6</Menu.Item>
                             <SubMenu key="sub3" title="Submenu">
                                 <Menu.Item key="7">Option 7</Menu.Item>
@@ -120,10 +119,15 @@ const App = () => {
                             <Route path="/user/user_info">
                                 <User />
                             </Route>
-                            <Route path="/user/user_info1">
+                            <Route path="/user/user_info1" exact>
                                 <User1 />
                             </Route>
-                            <Route path="/user/user_info2/:id" component={User1Detail}/>
+                            <Route path="/user/user_info1/:id" component={User1Detail}/>
+                            <Route path="/question/table" exact>
+                                <QuestionTable />
+                            </Route>
+                            <Route path="/question/table/:id" component={QuestionDetail}/>
+
                         </Switch>
                      
                     </Content>
@@ -132,7 +136,6 @@ const App = () => {
                 </Layout>
                
             </Layout>
-        </Router>
     );
 
 }

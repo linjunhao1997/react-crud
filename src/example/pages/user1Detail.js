@@ -1,30 +1,31 @@
 import {Descriptions} from 'antd'
 import axios from 'axios'
-import { useRequest } from 'ahooks';
-import { useParams }from 'react-router-dom'
-import { useState } from 'react';
-const User1Detail = () => {
-    const { id } = useParams()
-    const list = []
-    let data = {}
-    console.log("id:",id)
-    axios.get('/mock/user/123456', {dataType:'json'}) //这列的'/mock'与mock.js文件里的地址一致
-     .then(res=>{
-console.log(res.data)
-    data = res.data
-    Object.keys(data).forEach((field, index) => {
-        console.log(field)
-       list.push((<Descriptions.Item label={field}>{data[field]}</Descriptions.Item>))
-   })
-})
+import {useParams} from 'react-router-dom'
+import React, {useEffect, useState} from 'react';
 
-    
-     console.log("list:",list)
-    
+const User1Detail = () => {
+    const {id} = useParams()
+    const list = []
+    let [data, setData] = useState({})
+    useEffect(() => {
+        axios.get('/mock/user/123456', {dataType: 'json'}) //这列的'/mock'与mock.js文件里的地址一致
+            .then(res => {
+                console.log(res.data)
+                setData(res.data)
+            })
+    }, [])
+    console.log("id:", id)
+
+
+
+    console.log("list:", list)
+
     return (
         <div>
             <Descriptions title="用户详情">
-            {list}
+                <Descriptions.Item label="hehe">hehe</Descriptions.Item>
+                {console.log("return", data)}
+                {Object.keys(data).map((field) => <Descriptions.Item label={field} key={field}>{data[field]}</Descriptions.Item>)}
             </Descriptions>
         </div>
     )
