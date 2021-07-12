@@ -2,14 +2,14 @@ import {Descriptions} from 'antd'
 import {useRequest} from 'ahooks'
 import {useParams} from 'react-router-dom'
 import React, {useEffect, useState} from 'react';
-
+import {getSingleData} from '@/utils/basefunc'
 const QuestionDetail = () => {
     const { id } = useParams()
-    const { data, error, loading } = useRequest({
-        url: `/api/question/${id}`,
-        method: 'get',
+    const { data, error, loading } = useRequest( `/api/question/${id}`, {
+        requestMethod: (service) => getSingleData(service)
     })
     if (error) {
+        console.log(error)
         return <div>failed to load</div>;
     }
     if (loading) {

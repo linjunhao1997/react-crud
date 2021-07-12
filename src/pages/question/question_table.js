@@ -6,71 +6,13 @@ import {
     MenuItem
 } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
-import {PaginatedParams} from 'ahooks/lib/useAntdTable';
-import {sorter2s} from '@/lib/antd/sorter2s'
-import {useHistory, useLocation} from 'react-router';
+import {useHistory} from 'react-router';
 import QuestionUpdate from "@/pages/question/question_update";
 import {useStores} from "@/store";
 import QuestionCreate from "@/pages/question/question_create";
 import axios from "axios";
-
+import {getTableData} from '@/utils/basefunc'
 const {Option} = Select;
-
-interface Item {
-    id: number,
-    questionCategoryId: number,
-    type: string,
-    question: string,
-    explanationText: string,
-    answer: string,
-    explanationPic: string,
-    cdate: string,
-    mdate: string,
-    deleted: number,
-    questionCategory: any
-
-}
-
-interface Result {
-    total: number;
-    list: Item[];
-}
-
-let sorters = {}
-
-const getTableData = (
-    {current, pageSize, sorter}: PaginatedParams[0],
-    formData: Object,
-): Promise<Result> => {
-
-    let like = {};
-    Object.entries(formData).forEach(([key, value]) => {
-        if (value) {
-           like[key] = value
-        }
-    });
-
-    sorters = sorter2s(sorter, sorters)
-
-    const data =  {
-            page: current,
-            rows: pageSize,
-            filter: {
-                like: like
-            }
-    }
-    return fetch("/api/question/search", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    }).then((res) => res.json())
-        .then((res) => ({
-            total: res.data.total,
-            list: res.data.records,
-        }));
-};
 
 const QuestionTable = () => {
     let { QuestionStore } = useStores()
@@ -162,7 +104,7 @@ const QuestionTable = () => {
 
     const [form] = Form.useForm();
 
-    const {tableProps, search, refresh} = useAntdTable(getTableData, {
+    const {tableProps, search, refresh} = useAntdTable(getTableData("/api/question/_search"), {
         defaultPageSize: 5,
         form,
     });

@@ -15,9 +15,6 @@ import {
     Route,
     Link, Switch
 } from 'react-router-dom'
-import User from "@/example/pages/user";
-import User1 from "@/example/pages/user1";
-import User1Detail from "@/example/pages/user1Detail";
 import QuestionTable from "@/pages/question/question_table"
 import RoutePath from '@/lib/antd/path'
 import QuestionDetail from "@/pages/question/question_detail";
@@ -116,13 +113,6 @@ const App = () => {
                         }}
                     >
                         <Switch>
-                            <Route path="/user/user_info">
-                                <User />
-                            </Route>
-                            <Route path="/user/user_info1" exact>
-                                <User1 />
-                            </Route>
-                            <Route path="/user/user_info1/:id" component={User1Detail}/>
                             <Route path="/question/table" exact>
                                 <QuestionTable />
                             </Route>
