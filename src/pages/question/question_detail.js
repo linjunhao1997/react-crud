@@ -1,7 +1,7 @@
 import {Descriptions} from 'antd'
 import {useRequest} from 'ahooks'
 import {useParams} from 'react-router-dom'
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {getSingleData} from '@/utils/basefunc'
 const QuestionDetail = () => {
     const { id } = useParams()
@@ -9,7 +9,6 @@ const QuestionDetail = () => {
         requestMethod: (service) => getSingleData(service)
     })
     if (error) {
-        console.log(error)
         return <div>failed to load</div>;
     }
     if (loading) {

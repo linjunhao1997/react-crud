@@ -9,7 +9,7 @@ const map = {
     '/user/user_info1':'用户信息1',
 
     '/question': '试题',
-    '/question/table': '问题列表',
+    '/question/home': '问题列表',
 }
 
 const RoutePath = () => {

@@ -65,3 +65,7 @@ export const getTableData = (url) => (
 export const getSingleData = (url) => {
     return BASE_REQUEST.get(url)
 }
+
+export const updateSingleRecord = (url, data) => {
+    return BASE_REQUEST.patch(url, data)
+}

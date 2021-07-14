@@ -6,3 +6,7 @@ const login = (username, password, ...params) => {
         password: password,
     })
 }
+
+const initAccessList = () => {
+    return BASE_REQUEST.get()
+}

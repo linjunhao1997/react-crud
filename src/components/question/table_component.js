@@ -12,15 +12,15 @@ import {useStores} from "@/store";
 import QuestionCreate from "@/pages/question/question_create";
 import axios from "axios";
 import {getTableData} from '@/utils/basefunc'
+import {useObserver} from "mobx-react-lite";
 const {Option} = Select;
 
-const QuestionTable = () => {
+const QuestionTableComponent = () => {
     let { QuestionStore } = useStores()
     const history = useHistory()
     const [isOpen, setOpen] = useState(false);
     const [anchorPoint, setAnchorPoint] = useState({x: 0, y: 0});
     const [currentRecord, setCurrentRecord] = useState(null);
-    const [updateVisible, setUpdateVisible] = useState(false)
     const [createVisible, setCreateVisible] = useState(false)
     const updateSubmit$ = useEventEmitter()
     const createSubmit$ = useEventEmitter()
@@ -39,17 +39,8 @@ const QuestionTable = () => {
 
 
     const handleUpdateClick = () => {
-        if (currentRecord) {
-            axios.get(`/api/question/${currentRecord.id}`)
-                .then(function (response) {
-                    QuestionStore.setCurrentQuestionRecord(response.data.data)
-                    setUpdateVisible(true)
-                })
-                .catch(function (error) {
-                    console.log(error);
-                })
-        }
-
+       QuestionStore.setCurrentQuestionRecord(currentRecord)
+       QuestionStore.setUpdateModelVisible(true)
     }
 
     const handleUpdateSubmitClick = () => {
@@ -202,8 +193,9 @@ const QuestionTable = () => {
         </div>
     );
 
-    return (
+    return useObserver(() => (
         <div>
+            <div>{QuestionStore.refreshTime}</div>
             <Button onClick={handleCreateClick}>
                 新增
             </Button>
@@ -233,32 +225,6 @@ const QuestionTable = () => {
                 <MenuItem onClick={handleDeleteClick}>删除</MenuItem>
             </ControlledMenu>
             <Modal
-                    forceRender={true}
-                    bodyStyle={{maxHeight: '500px', overflowY: 'scroll'}}
-                    width={500}
-                    title="修改"
-                    centered
-                    visible={updateVisible}
-                    onCancel={() => {
-                        setUpdateVisible(false)
-                    }}
-                    footer={
-                        <>
-                            <Button key="yes" type="primary" onClick={handleUpdateSubmitClick}>
-                                确认
-                            </Button>
-                            <Button key="no" onClick={() => {
-                                setUpdateVisible(false)
-                            }}>
-                                取消
-                            </Button>
-                        </>
-                    }>
-
-                    <QuestionUpdate updateSubmit$={updateSubmit$} refresh={refresh}/>
-
-            </Modal>
-            <Modal
                 bodyStyle={{maxHeight: '500px', overflowY: 'scroll'}}
                 width={500}
                 title="新增"
@@ -283,12 +249,10 @@ const QuestionTable = () => {
                 <QuestionCreate createSubmit$={createSubmit$} refresh={refresh}/>
 
             </Modal>
-
-
         </div>
 
 
-    );
+    ));
 };
 
-export default QuestionTable
+export default QuestionTableComponent

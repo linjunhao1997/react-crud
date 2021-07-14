@@ -15,9 +15,9 @@ import {
     Route,
     Link, Switch
 } from 'react-router-dom'
-import QuestionTable from "@/pages/question/question_table"
 import RoutePath from '@/lib/antd/path'
 import QuestionDetail from "@/pages/question/question_detail";
+import QuestionHomePage from "@/pages/question/home_page";
 
 const {Header, Sider, Content, Footer} = Layout;
 const {SubMenu} = Menu;
@@ -113,8 +113,8 @@ const App = () => {
                         }}
                     >
                         <Switch>
-                            <Route path="/question/table" exact>
-                                <QuestionTable />
+                            <Route path="/question/home" exact>
+                                <QuestionHomePage />
                             </Route>
                             <Route path="/question/table/:id" component={QuestionDetail}/>
 
