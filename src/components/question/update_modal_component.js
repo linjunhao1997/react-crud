@@ -4,6 +4,7 @@ import {useStores} from "@/store";
 import QuestionUpdateFormComponent from "@/components/question/update_form_component";
 import {updateSingleRecord} from "@/utils/basefunc";
 import {useObserver} from "mobx-react-lite";
+import {QUESTION_RESOURCE} from "@/api/question";
 
 const UpdateModalComponent = () => {
 
@@ -11,10 +12,8 @@ const UpdateModalComponent = () => {
 
     const {QuestionStore} = useStores()
 
-    const [visible, setVisible] = useState(false)
-
     const updateSubmitAction = () => {
-        updateSingleRecord(`/api/question/${QuestionStore.currentQuestionRecord.id}`,  questionUpdateFormComponentRef.current.getFormValue())
+        updateSingleRecord(`${QUESTION_RESOURCE}/${QuestionStore.currentQuestionRecord.id}`,  questionUpdateFormComponentRef.current.getFormValue())
             .then((resp) => {
                     if (resp.data.success) {
                         message.success({

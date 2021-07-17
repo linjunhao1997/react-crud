@@ -1,11 +1,11 @@
 import React from 'react';
+import './index.css'
 import ReactDOM from 'react-dom';
-//import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import zhCN from 'antd/lib/locale/zh_CN';
 import {ConfigProvider, Modal} from 'antd';
-import {BrowserRouter} from 'react-router-dom'
+import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import {Provider} from "mobx-react";
 import store from "@/store/QuestionStore";
 
@@ -15,7 +15,7 @@ ReactDOM.render(
     <ConfigProvider locale={zhCN}>
         <Provider store={store}>
             <BrowserRouter>
-                <App/>
+               <App/>
             </BrowserRouter>
         </Provider>
     </ConfigProvider>,

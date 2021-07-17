@@ -8,6 +8,8 @@ class QuestionStore {
 
     updateModelVisible = false
 
+    insertModelVisible = false
+
     constructor() {
         makeAutoObservable(this)
     }
@@ -23,6 +25,11 @@ class QuestionStore {
     @action setUpdateModelVisible(visible) {
         this.updateModelVisible = visible
         console.log(this.updateModelVisible)
+    }
+
+    @action setInsertModelVisible(visible) {
+        this.insertModelVisible = visible
+        console.log(this.insertModelVisible)
     }
 
 

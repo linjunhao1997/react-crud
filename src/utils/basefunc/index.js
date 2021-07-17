@@ -69,3 +69,11 @@ export const getSingleData = (url) => {
 export const updateSingleRecord = (url, data) => {
     return BASE_REQUEST.patch(url, data)
 }
+
+export const insertNewRecord = (url, data) => {
+    return BASE_REQUEST.post(url, data)
+}
+
+export const deleteSingleRecord = (url) => {
+    return BASE_REQUEST.delete(url)
+}
